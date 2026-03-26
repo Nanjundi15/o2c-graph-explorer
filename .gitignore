@@ -1,0 +1,23 @@
+# Python
+__pycache__/
+*.py[cod]
+*.pyc
+.env
+venv/
+.venv/
+
+# Node
+node_modules/
+dist/
+.cache/
+
+# Data (don't commit the DB — ingest.py regenerates it)
+data/o2c.db
+
+# OS
+.DS_Store
+Thumbs.db
+
+# IDE
+.vscode/
+.idea/

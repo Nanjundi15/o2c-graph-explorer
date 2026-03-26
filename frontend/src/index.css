@@ -1,0 +1,155 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ── Dark theme (default) ─────────────────────────────────────────────────── */
+:root,
+[data-theme="dark"] {
+  --bg-base:        #060912;
+  --bg-surface:     #0A0F1E;
+  --bg-elevated:    #111827;
+  --bg-card:        #1a2235;
+  --border:         #1e293b;
+  --border-hover:   #334155;
+  --cyan:           #22d3ee;
+  --cyan-dim:       #22d3ee55;
+  --amber:          #fbbf24;
+  --rose:           #fb7185;
+  --emerald:        #34d399;
+  --text-primary:   #f1f5f9;
+  --text-secondary: #94a3b8;
+  --text-muted:     #475569;
+  --shadow:         rgba(0,0,0,0.6);
+  --noise-opacity:  0.4;
+
+  /* Graph node colors — dark */
+  --node-customer-bg:   #1e3a5f;  --node-customer-border:   #3b82f6;
+  --node-order-bg:      #1a3a2a;  --node-order-border:      #22c55e;
+  --node-delivery-bg:   #2d2a1e;  --node-delivery-border:   #f59e0b;
+  --node-billing-bg:    #2a1e3a;  --node-billing-border:    #a855f7;
+  --node-accounting-bg: #1e2d3a;  --node-accounting-border: #22d3ee;
+  --node-payment-bg:    #3a1e1e;  --node-payment-border:    #fb7185;
+  --node-product-bg:    #2a2a1e;  --node-product-border:    #84cc16;
+  --node-plant-bg:      #1e2a2a;  --node-plant-border:      #2dd4bf;
+  --node-edge:          #1e293b;
+  --graph-grid:         #22d3ee;
+}
+
+/* ── Light theme ──────────────────────────────────────────────────────────── */
+[data-theme="light"] {
+  --bg-base:        #f8fafc;
+  --bg-surface:     #ffffff;
+  --bg-elevated:    #f1f5f9;
+  --bg-card:        #ffffff;
+  --border:         #e2e8f0;
+  --border-hover:   #cbd5e1;
+  --cyan:           #0891b2;
+  --cyan-dim:       #0891b255;
+  --amber:          #d97706;
+  --rose:           #e11d48;
+  --emerald:        #059669;
+  --text-primary:   #0f172a;
+  --text-secondary: #475569;
+  --text-muted:     #94a3b8;
+  --shadow:         rgba(0,0,0,0.12);
+  --noise-opacity:  0;
+
+  /* Graph node colors — light (softer, readable on white) */
+  --node-customer-bg:   #dbeafe;  --node-customer-border:   #2563eb;
+  --node-order-bg:      #dcfce7;  --node-order-border:      #16a34a;
+  --node-delivery-bg:   #fef3c7;  --node-delivery-border:   #d97706;
+  --node-billing-bg:    #f3e8ff;  --node-billing-border:    #9333ea;
+  --node-accounting-bg: #cffafe;  --node-accounting-border: #0891b2;
+  --node-payment-bg:    #ffe4e6;  --node-payment-border:    #e11d48;
+  --node-product-bg:    #ecfccb;  --node-product-border:    #65a30d;
+  --node-plant-bg:      #ccfbf1;  --node-plant-border:      #0d9488;
+  --node-edge:          #cbd5e1;
+  --graph-grid:         #94a3b8;
+}
+
+/* ── Base styles ──────────────────────────────────────────────────────────── */
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+html, body, #root {
+  height: 100%;
+  background: var(--bg-base);
+  color: var(--text-primary);
+  font-family: 'DM Sans', sans-serif;
+  -webkit-font-smoothing: antialiased;
+  transition: background 0.25s ease, color 0.25s ease;
+}
+
+/* Scrollbar */
+::-webkit-scrollbar       { width: 4px; height: 4px; }
+::-webkit-scrollbar-track { background: var(--bg-surface); }
+::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
+::-webkit-scrollbar-thumb:hover { background: var(--cyan-dim); }
+
+/* Noise overlay — only visible in dark mode */
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.03'/%3E%3C/svg%3E");
+  pointer-events: none;
+  z-index: 9999;
+  opacity: var(--noise-opacity);
+}
+
+/* ── Utility classes ──────────────────────────────────────────────────────── */
+.bg-base      { background: var(--bg-base); }
+.bg-surface   { background: var(--bg-surface); }
+.bg-elevated  { background: var(--bg-elevated); }
+.bg-card      { background: var(--bg-card); }
+.border-theme { border-color: var(--border); }
+.text-primary   { color: var(--text-primary); }
+.text-secondary { color: var(--text-secondary); }
+.text-muted     { color: var(--text-muted); }
+
+.glow-cyan  { box-shadow: 0 0 20px var(--cyan-dim), 0 0 60px var(--cyan-dim); }
+.text-glow  { text-shadow: 0 0 20px var(--cyan); }
+
+#cy { width: 100%; height: 100%; background: transparent; }
+
+/* Scan lines — dark only */
+[data-theme="dark"] .scan-lines::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: repeating-linear-gradient(
+    0deg, transparent, transparent 2px,
+    rgba(0,0,0,0.03) 2px, rgba(0,0,0,0.03) 4px
+  );
+  pointer-events: none;
+  z-index: 1;
+}
+
+/* Loading shimmer */
+@keyframes shimmer {
+  0%   { background-position: -200% 0; }
+  100% { background-position:  200% 0; }
+}
+.shimmer {
+  background: linear-gradient(90deg,
+    var(--bg-card) 25%,
+    var(--bg-elevated) 50%,
+    var(--bg-card) 75%
+  );
+  background-size: 200% 100%;
+  animation: shimmer 1.5s infinite;
+}
+
+/* Cursor blink */
+@keyframes blink { 0%,100% { opacity:1; } 50% { opacity:0; } }
+.cursor-blink { animation: blink 1s step-end infinite; }
+
+/* Smooth theme transition on all elements */
+*, *::before, *::after {
+  transition-property: background-color, border-color, color, box-shadow;
+  transition-duration: 0.2s;
+  transition-timing-function: ease;
+}
+/* But NOT on animations/transforms */
+[class*="animate-"], [class*="motion"] {
+  transition-property: none;
+}
