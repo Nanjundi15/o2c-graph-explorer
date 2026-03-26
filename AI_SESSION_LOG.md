@@ -3,7 +3,7 @@
 **Tool:** Claude (claude.ai) — Sonnet 4.6  
 **Project:** SAP Order-to-Cash Graph Explorer  
 **Session Date:** March 24–26, 2026  
-**Total Duration:** ~16 - 20 hours across multiple sessions
+**Total Duration:** ~12 hours across multiple sessions
 
 ---
 
