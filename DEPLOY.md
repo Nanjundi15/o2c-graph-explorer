@@ -1,6 +1,6 @@
-# Deployment Guide
+# 🚀 Deployment Guide
 
-Two services: **Backend on Railway** + **Frontend on Vercel**.
+Two services: **Backend on Render** + **Frontend on Vercel**
 Total setup time: ~15 minutes.
 
 ---
@@ -17,90 +17,141 @@ git push -u origin main
 
 ---
 
-## Step 2 — Deploy Backend on Railway
+## Step 2 — Deploy Backend on Render
 
-1. Go to https://railway.app → New Project → Deploy from GitHub repo
-2. Select your repo → set **Root Directory** to `backend`
-3. Railway auto-detects `nixpacks.toml` — it will:
-   - Install Python deps
-   - Run `python ingest.py` (loads the DB)
-   - Start `uvicorn main:app`
-4. Add environment variables in Railway dashboard:
-   ```
-   GEMINI_API_KEY  =  your_gemini_api_key_here
-   DATA_DIR        =  /app/data/sap-o2c-data
-   DB_PATH         =  /app/data/o2c.db
-   ```
-5. **Important:** Upload the `data/sap-o2c-data/` folder to your repo
-   (it needs the JSONL files to run ingest.py on first deploy)
-6. Copy the Railway domain — looks like: `https://o2c-api-production.up.railway.app`
+1. Go to https://render.com → New → Web Service
+2. Connect your GitHub repo
+3. Set **Root Directory** to `backend`
 
-> **Test:** Visit `https://your-app.up.railway.app/api/graph/overview`
-> You should see JSON with nodes and edges.
+Render will:
+
+* Install Python dependencies
+* Run `python ingest.py` (creates & loads DB)
+* Start FastAPI using uvicorn
+
+---
+
+### Build & Start Commands
+
+```
+Build Command:
+pip install -r requirements.txt && python ingest.py
+
+Start Command:
+uvicorn main:app --host 0.0.0.0 --port $PORT
+```
+
+---
+
+### Environment Variables
+
+```
+GROQ_API_KEY   = your_groq_api_key_here
+DATABASE_PATH  = /opt/render/project/src/o2c.db
+```
+
+---
+
+### Important
+
+* Ensure `o2c.db` exists OR is created by `ingest.py`
+* Keep your dataset files in repo if ingest depends on them
+
+---
+
+### Test Backend
+
+```
+https://your-render-app.onrender.com/api/graph/overview
+```
+
+You should see JSON output.
 
 ---
 
 ## Step 3 — Deploy Frontend on Vercel
 
 1. Go to https://vercel.com → New Project → Import from GitHub
-2. Select your repo → set **Root Directory** to `frontend`
-3. Vercel auto-detects Vite
-4. Add environment variable:
-   ```
-   VITE_API_URL  =  https://your-railway-domain.up.railway.app
-   ```
-5. Deploy → Vercel gives you a URL like `https://o2c-graph-explorer.vercel.app`
+2. Select your repo
+3. Set **Root Directory** to `frontend`
+4. Vercel auto-detects Vite
 
-> **Test:** Open the Vercel URL — you should see the graph and be able to chat.
+---
+
+### Environment Variable
+
+```
+VITE_API_URL = https://your-render-app.onrender.com
+```
+
+⚠️ Do NOT add `/api` (handled in code)
+
+---
+
+### Deploy
+
+Vercel will give a URL like:
+
+```
+https://your-app.vercel.app
+```
 
 ---
 
 ## Step 4 — Verify End-to-End
 
-Open the app and try:
-- [ ] Graph loads with 11 entity nodes
-- [ ] Click a node → drawer slides in with records
-- [ ] Analytics tab → top products chart loads
-- [ ] Chat: "Which products have the most billing documents?" → data-backed answer
-- [ ] Chat: "Write me a poem" → guardrail rejection message
-- [ ] Chat: "Trace billing document 90504248" → full O2C flow
+Open your app and test:
+
+* [ ] Graph loads with entity nodes
+* [ ] Click a node → records appear
+* [ ] Analytics tab loads correctly
+* [ ] Chat works with real data
+* [ ] No blank screen or API errors
 
 ---
 
-## Alternative: Run as a Single Service (no Vercel needed)
+### Chat Test Examples
 
-Build the frontend and serve it from FastAPI:
-
-```bash
-# Build frontend
-cd frontend && npm run build  # outputs to frontend/dist/
-
-# FastAPI serves dist/ automatically (see main.py)
-cd backend && uvicorn main:app --host 0.0.0.0 --port 8000
+```
+Which products have the most billing documents?
 ```
 
-Then on Railway, set root to `/` (not `/backend`) and use:
 ```
-build:  cd frontend && npm install && npm run build && cd ../backend && pip install -r requirements.txt && python ingest.py
-start:  cd backend && uvicorn main:app --host 0.0.0.0 --port $PORT
+Trace billing document 90504248
 ```
+
+---
+
+## Debug Tips
+
+* If chat shows “no results” → check DATABASE_PATH
+* If frontend blank → check VITE_API_URL
+* If API fails → check Render logs
 
 ---
 
 ## Local Development
 
 ```bash
-# Terminal 1 — Backend
+# Backend
 cd backend
 pip install -r requirements.txt
-python ingest.py          # once
-cp .env.example .env      # add your GEMINI_API_KEY
+python ingest.py
 uvicorn main:app --reload --port 8000
 
-# Terminal 2 — Frontend
+# Frontend
 cd frontend
 npm install
-npm run dev               # opens http://localhost:5173
+npm run dev
 ```
 
-API docs available at: http://localhost:8000/docs
+Frontend: http://localhost:5173
+Backend: http://localhost:8000/docs
+
+---
+
+## Architecture
+
+```
+User → Vercel (Frontend) → Render (Backend) → DB + Groq API
+```
