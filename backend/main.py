@@ -25,7 +25,11 @@ app = FastAPI(
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],   # Tighten to your Vercel URL in production if desired
+    allow_origins=[
+        "http://localhost:5173",
+        "https://o2c-graph-explorer-61e3.vercel.app",
+        "https://*.vercel.app",
+    ],   # Tighten to your Vercel URL in production if desired
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
